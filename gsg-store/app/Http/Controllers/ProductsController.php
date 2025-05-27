@@ -16,6 +16,8 @@ class ProductsController extends Controller
 
     public function index()
     {
+        echo env('APP_NAME'); // Laravel -> (from .env file)
+        echo config('app.name');  // Laravel -> (from app.php file (in config folder))
         return $this->products; // Array (json) : {"Watches":300,"T-shirts":80,"Cameras":2000,"0":"Mobiles => 1000"}
     }
 
