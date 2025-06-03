@@ -57,6 +57,7 @@ class CategoriesController extends Controller
         ORDER BY created_at DESC, name ASC
         */
 
+        /*
         // return collection of Category model object
         $categories = Category::leftJoin('categories as parents', 'parents.id', '=', 'categories.parent_id')
         ->select([
@@ -69,10 +70,10 @@ class CategoriesController extends Controller
         ->get(); 
         // ->dd();  // SQL Result "select `categories`.*, `parents`.`name` as `parent_name` from `categories` left join `categories` as `parents` on `parents`.`id` = `categories`.`parent_id` where `categories`.`status` = ? order by `categories`.`created_at` desc, `categories`.`name` asc"
 
+        */
 
 
-
-        // $categories = Category::all();
+        $categories = Category::all();
         $title =  'Categories List';
 
 
