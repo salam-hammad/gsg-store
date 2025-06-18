@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 use Traversable;
+use Illuminate\Support\Str;
 
 class CategoriesController extends Controller
 {
@@ -121,7 +122,8 @@ class CategoriesController extends Controller
      */
     public function create()
     {
-        //
+        $parents = Category::all();
+        return view('admin.categories.create', compact('parents'));
     }
 
     /**
@@ -129,7 +131,87 @@ class CategoriesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // insert new Category in database :
+
+        // Request Merge => merge() method
+        $request->merge([
+            'slug' => Str::slug($request->post('name')),
+            'status' => 'active',
+        ]);
+        
+
+        /*
+        // return array of all form fields
+        $request->all();
+        dd($request->all());
+
+        // return single field value
+        $request->description;  
+        $request->input('description');        
+        $request->get('description');        
+        $request->post('description');        
+        $request->query('description');    // ?description=value  
+
+        */
+
+
+        /*        
+        // Method #1
+        $category = new Category();
+        $category->name = $request->post('name');
+        $category->slug = Str::slug($request->post('name'));
+        $category->parent_id = $request->post('parent_id');
+        $category->description = $request->post('description');
+        $category->status = $request->post('status', 'active');
+        $category->save();
+
+        dd($category);
+        */
+
+        
+
+        // Method #2: Mass Assignment (best way)
+        
+        // $category = Category::create($request->except('image', '_token'));
+        $category = Category::create($request->all());
+        // dd($category);        
+
+        /*
+        $category = Category::create([
+            'name' => $request->post('name'),
+            'slug' => Str::slug($request->post('name')),
+            'parent_id' => $request->post('parent_id'),
+            'description' => $request->post('description'),
+            'status' => $request->post('status', 'active'),
+        ]);
+
+        */
+
+
+        
+        // Method #3: Mass Assignment
+        /*
+        $category = new Category($request->all());
+        $category->save();
+
+        dd($category);    
+        */    
+        
+
+        /*
+        $category = new Category([        
+            'name' => $request->post('name'),
+            'parent_id' => $request->post('parent_id'),
+            'description' => $request->post('description'),
+            'status' => $request->post('status', 'active'),
+        ]);
+        $category->save();
+           
+        dd($category);
+        */
+
+        return redirect()->route('categories.index');
+        // return redirect()->back(); // return to create form bage
     }
 
     /**
