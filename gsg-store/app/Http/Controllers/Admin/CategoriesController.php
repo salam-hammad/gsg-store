@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use stdClass;
 use Traversable;
 use Illuminate\Support\Str;
@@ -76,6 +77,8 @@ class CategoriesController extends Controller
 
         $categories = Category::all();
         $title =  'Categories List';
+        $success = session()->get('success'); // Read into session
+        // session()->forget('success'); // delete from session
 
 
         /*
@@ -89,7 +92,7 @@ class CategoriesController extends Controller
 
         // dd(compact('categories', 'title'));
 
-        return view('admin.categories.index', compact('categories', 'title'));
+        return view('admin.categories.index', compact('categories', 'title', 'success'));
 
 
         // return view('admin/categories/index');
@@ -99,6 +102,8 @@ class CategoriesController extends Controller
         return view('admin.categories.index', [
             'categories' => $entries,
             'title' => 'Categories List',
+            'success' => $success,
+
         ]);
         */
 
@@ -123,7 +128,8 @@ class CategoriesController extends Controller
     public function create()
     {
         $parents = Category::all();
-        return view('admin.categories.create', compact('parents'));
+        $category = new Category();
+        return view('admin.categories.create', compact('category', 'parents'));
     }
 
     /**
@@ -227,7 +233,11 @@ class CategoriesController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        // $category = Category::where('id', '=', $id)->first(); ===>  $category = Category::find($id);
+        $category = Category::find($id);
+        $parents = Category::where('id', '<>', $category->id)->get();
+
+        return view('admin.categories.edit', compact('category', 'parents'));
     }
 
     /**
@@ -235,7 +245,38 @@ class CategoriesController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Request Merge => merge() method --->  [update slug] 
+        $request->merge([
+            'slug' => Str::slug($request->name),
+        ]);
+
+        //  Mass asignment (One Statement)
+        Category::where('id', '=', $id)->update( $request->all() );
+
+
+        // find() => Select then update() : 
+        // $category = new Category();
+        $category = Category::find($id);
+
+        /*
+        // Method 1:
+        $category->name = $request->post('name');
+        $category->parent_id = $request->post('parent_id');
+        $category->description = $request->post('description');
+        $category->status = $request->post('status');
+        $category->save();
+        */
+
+        // Method 2: Mass asignment
+        $category->update( $request->all() );
+
+        /*
+        // Method 3: Mass asignment
+        $category->fill( $request->all() )->save();        
+        */
+
+        // PRG
+        return redirect()->route('categories.index');
     }
 
     /**
@@ -243,6 +284,43 @@ class CategoriesController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        /*
+        // Method 1:
+        $category = Category::find($id);      // Select 
+        $category->delete();
+        */
+
+        // Method 2:
+        Category::destroy($id);
+
+        /*
+        // Method 3:
+        Category::where('id', '=', $id)->delete();
+        */
+
+        /*
+        // Session :
+        // Write into session:
+        Session::put();  // Facade class
+        session()->put('success', 'Category deleted');
+        session([
+            'success' => 'Category deleted!',
+        ]);
+        // Read from session:
+        Session::get();  // Facade class
+        session()->get('success');
+        session('success');
+        // Delete from session:
+        Session::forget();  // Facade class
+        session()->forget('success');
+        */
+
+        // session()->put('success', 'Category deleted');
+        // session()->flash('success', 'Category deleted');
+
+
+        // PRG ( with flash message):
+        return redirect()->route('categories.index')
+        ->with('success', 'Category deleted');     
     }
 }

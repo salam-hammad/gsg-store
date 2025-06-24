@@ -18,8 +18,12 @@
     {{-- <input type="hidden" name="_token" value="{{ csrf_token() }}"> --}}
     {{-- {{ csrf_field() }} --}}
     @csrf
+
+    @include('admin.categories._form', [
+        'button' => 'Add',
+    ])
     
-    <div class="form-group">
+    {{-- <div class="form-group">
         <label for="">Cetegory Name</label>
         <input type="text" class="form-control" name="name">
     </div>
@@ -46,7 +50,7 @@
 
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Save</button>
-    </div>
+    </div> --}}
 
 </form>
 
